@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>台灣版簡化 LFPQ 測驗</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2em;
+      max-width: 800px;
+      margin: auto;
+    }
+    .question {
+      margin-bottom: 2em;
+    }
+    .liking-options label,
+    .wanting-options label {
+      display: block;
+      margin: 0.5em 0;
+    }
+    .image-option {
+      display: flex;
+      align-items: center;
+      gap: 1em;
+    }
+    img {
+      width: 100px;
+      height: auto;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🍱 台灣版簡化 LFPQ 測驗</h1>
+  <p>請依照直覺作答。以下是您對各種食物的喜好與渴望評估。</p>
+
+  <h2>😋 明顯喜好（Liking）</h2>
+  <div id="liking-section"></div>
+
+  <h2>🔥 潛意識渴望（Wanting）</h2>
+  <div id="wanting-section"></div>
+
+  <button onclick="submitForm()">提交問卷</button>
+
+  <script>
+    const likingFoods = [
+      "珍珠奶茶", "炸甜甜圈", "炸雞腿", "鹽酥雞",
+      "芭樂", "小番茄", "茶葉蛋", "水煮玉米"
+    ];
+
+    const wantingPairs = [
+      ["珍珠奶茶", "芭樂"],
+      ["炸雞腿", "水煮玉米"],
+      ["炸甜甜圈", "小番茄"],
+      ["鹽酥雞", "茶葉蛋"]
+    ];
+
+    const foodImages = {
+      "珍珠奶茶": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Bubble_Tea.jpg/320px-Bubble_Tea.jpg",
+      "炸甜甜圈": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Donut_with_sprinkles.jpg/320px-Donut_with_sprinkles.jpg",
+      "炸雞腿": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Fried_chicken_-_Arnold_Gatilao.jpg/320px-Fried_chicken_-_Arnold_Gatilao.jpg",
+      "鹽酥雞": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Taiwanese_popcorn_chicken.jpg/320px-Taiwanese_popcorn_chicken.jpg",
+      "芭樂": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Guava.jpg/320px-Guava.jpg",
+      "小番茄": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Cherry_tomatoes.jpg/320px-Cherry_tomatoes.jpg",
+      "茶葉蛋": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Chinese_tea_egg.jpg/320px-Chinese_tea_egg.jpg",
+      "水煮玉米": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Boiled_corn.jpg/320px-Boiled_corn.jpg"
+    };
+
+    const likingContainer = document.getElementById("liking-section");
+    likingFoods.forEach((food, idx) => {
+      const div = document.createElement("div");
+      div.className = "question liking";
+      div.innerHTML = `<h3>${idx + 1}. ${food} 看起來有多好吃？</h3>
+        <img src="${foodImages[food]}" alt="${food}">
+        <div class="liking-options">
+          <label><input type="radio" name="liking${idx}" value="1"> 1 一點也不好吃</label>
+          <label><input type="radio" name="liking${idx}" value="2"> 2</label>
+          <label><input type="radio" name="liking${idx}" value="3"> 3</label>
+          <label><input type="radio" name="liking${idx}" value="4"> 4</label>
+          <label><input type="radio" name="liking${idx}" value="5"> 5 非常好吃</label>
+        </div>`;
+      likingContainer.appendChild(div);
+    });
+
+    const wantingContainer = document.getElementById("wanting-section");
+    wantingPairs.forEach((pair, idx) => {
+      const div = document.createElement("div");
+      div.className = "question wanting";
+      div.innerHTML = `<h3>${idx + 1}. 現在你比較想吃哪一個？</h3>`;
+      const options = document.createElement("div");
+      options.className = "wanting-options";
+      pair.forEach(food => {
+        options.innerHTML += `
+          <label class="image-option">
+            <input type="radio" name="wanting${idx}" value="${food}">
+            <img src="${foodImages[food]}" alt="${food}">
+            ${food}
+          </label>`;
+      });
+      div.appendChild(options);
+      wantingContainer.appendChild(div);
+    });
+
+    function submitForm() {
+      const likingResults = likingFoods.map((_, idx) => document.querySelector(`input[name='liking${idx}']:checked`));
+      const wantingResults = wantingPairs.map((_, idx) => document.querySelector(`input[name='wanting${idx}']:checked`));
+
+      if (likingResults.includes(null) || wantingResults.includes(null)) {
+        alert('請完成所有題目再提交。');
+        return;
+      }
+
+      const likingScores = likingResults.map(e => Number(e.value));
+      const wantingChoices = wantingResults.map(e => e.value);
+
+      const totalLiking = likingScores.reduce((a, b) => a + b, 0);
+      const highFatChoices = ["珍珠奶茶", "炸甜甜圈", "炸雞腿", "鹽酥雞"];
+      const wantingHighFatCount = wantingChoices.filter(f => highFatChoices.includes(f)).length;
+
+      alert(`感謝作答！\nLiking 總分: ${totalLiking} / 40\nWanting 選擇高脂食物次數: ${wantingHighFatCount} / 4`);
+    }
+  </script>
+</body>
+</html>
